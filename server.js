@@ -1,14 +1,40 @@
 // Institusi Pendidikan Tinggi Malaysia (IPTM) Blockchain Project: Bootnodes for IPTM Blockchain Nodes
 // Programmer: Dr. Mohd Anuar Mat Isa, iExploTech & IPTM Secretariat
-// Website: www.iptm.online, www.mhei.online, www.iexplotech.com
+// Website: https://github.com/iexplotech  www.iptm.online, www.mhei.online, www.iexplotech.com
+// License: GNU General Public License v3.0
 
 const Bootnodes_Server_Version = 'alpha:0.1:IPTM:iExploTech';
-console.log('VERSION: ' + Bootnodes_Server_Version);
+console.log('IPTM BOOTNODES SERVER, Version: ' + Bootnodes_Server_Version);
+
+// Configuration Flag
+//const MACHINE_HOST_CLIENT_SERVER = true; // this machine running both bootnode server and client
+//const MACHINE_HOST_CLIENT_SERVER_IP = '47.254.195.137'; // must fixed public IPv4
+
+// check OS platform
+var win32 = process.platform === "win32"; // Same for x64 Win OS
+var darwin = process.platform === "darwin";  // Mac
+var linux = process.platform === "linux";
+console.log(`Supported OS Platform = Windows:${win32} Linux:${darwin} Mac:${linux}`);
+console.log(`This OS Platform is ${process.platform}`);
+
+if(win32 == true) {
+	console.log('OK! Supported Operating System');
+}
+else if (true == (darwin || linux)) {
+	console.log('OK! Supported Operating System');
+} else {
+	console.log('Halted! Not Supported Operating System');
+	process.exit(-1);
+}
 
 const list_bootnodes_html = '/list_bootnodes.html';
 const list_bootnodes_json = '/list_bootnodes.json';
 const invalid_request_html = '/invalid_request.html';
-const default_list_bootnodes = '{"bootnodes":[{"nodeId":"Node01","enodeId":"12121212","minerAddress":"0x212121","timeStamp":"0"}]}'
+const bootnodes_table_html = '/bootnodes_table.html';
+const index_html = '/index.html';
+const default_list_bootnodes = '{"bootnodes":[{"nodeId":"DefaultServerNode01","enodeId":"enode://c6ab138c36886cb28196b1dcd9d7ebc0f2818e543b5a4f93cd1cc7bfc6b6c820f660edce9762027794099adce4edd110409e4e17a2f3862b6a400660a46c4324@127.0.0.1:30303?discport=0","minerAddress":"0x80ce17271ffa4a7f66e2cbf3561a6946587f470d","timeStamp":"26 Apr 2020 17:31:58"}]}';
+const b1 = '<link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" rel=\"stylesheet\">\n<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js\"></script>\n<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js\"></script>\n<script type=\"text/javascript\">'
+const b2 = '$(document).ready(function () {\n    var html = \'<table class=\"table table-striped\">\';\n    html += \'<tr>\';\n    var flag = 0;\n    $.each(data[0], function(index, value){\n        html += \'<th>\'+index+\'</th>\';\n    });\n    html += \'</tr>\';\n     $.each(data, function(index, value){\n         html += \'<tr>\';\n        $.each(value, function(index2, value2){\n            html += \'<td>\'+value2+\'</td>\';\n        });\n        html += \'<tr>\';\n     });\n     html += \'</table>\';\n     $(\'body\').html(html);\n});\n</script>';
 
 var http = require('http');
 var fs = require('fs');
@@ -148,17 +174,46 @@ var readListBootnodes = function (data) {
 }
 
 
-var checkBootnodesData = function (data) {
+var checkBootnodesData = function (data, client_ip) {
+	console.log('client_ip: ' + client_ip);  // e.g. ::ffff:127.0.0.1
 	console.log('checkBootnodesData: ' + data);
+	
+	if(client_ip === null)
+	{
+		console.log('Empty data input from client ip: ');
+		return false;
+	}
+	
+	var IPAddressArray = client_ip.split(':');
+	
+	if(IPAddressArray === null)
+	{
+		console.log('Empty/Invalid data input from client ip: ');
+		return false;
+	}
+	
+	console.log(IPAddressArray.length);
+	for(i in IPAddressArray){  // index 3 (last index) is the ipv4 address
+		console.log(IPAddressArray[i]);
+	}
 	
 	if(IsJsonString(data) == true) {
 		var obj = JSON.parse(data);
 		console.log(obj.bootnodes[0].nodeId);
 		console.log(obj.bootnodes[0].enodeId);
 		console.log(obj.bootnodes[0].minerAddress);
+		console.log(obj.bootnodes[0].timeStamp);
 		
 		readListBootnodes(data);
 		
+		// modify enodeId to public ipv4 addresss
+		console.log('enodeId from Client: ' + obj.bootnodes[0].enodeId);
+		obj.bootnodes[0].enodeId = obj.bootnodes[0].enodeId.replace('127.0.0.1', IPAddressArray[3]); // replace to public IPv4 Address
+		console.log('enodeId from Client updated to Public IP: ' + obj.bootnodes[0].enodeId);
+		
+		data = JSON.stringify(obj); // update bootnode data with updated public IPv4 Address 
+		
+		// changed enodeId with public IPv4 Address
 		addNewBootnodesIntoCacheListBootnodes(data);
 	}
 }
@@ -191,8 +246,17 @@ const server = http.createServer( function (request, response) {
 		// json file
 		} else if (pathname === list_bootnodes_json) {
 			console.log(list_bootnodes_json);
-			checkBootnodesData(body);
+			checkBootnodesData(body, request.socket.remoteAddress);
+			
+		// table file
+		} else if (pathname === bootnodes_table_html) {
+			console.log(bootnodes_table_html);
+		
+		// table file
+		} else if (pathname === index_html) {
+			console.log(index_html);
 		}
+		
 	});
 		
 
@@ -214,14 +278,39 @@ const server = http.createServer( function (request, response) {
 			// HTTP Status: 200 : OK
 			// Content Type: text/plain
 			response.writeHead(200, {'Content-Type': 'text/html'});	
-	
-			// Write the content of the file to response body
-			response.write(data.toString());		
+			
+			if (pathname === bootnodes_table_html || pathname === index_html) {
+				console.log(bootnodes_table_html + ' or ' + index_html);
+				//var json_string = 'var data = ' + JSON.stringify(cache_list_bootnodes_obj).substr(13) + ';';
+				//var str2 = '[{"nodeId":"Node01","enodeId":"12121212","minerAddress":"0x212121","timeStamp":"0", "ipAddress":"127.0.0.1"}, {"nodeId":"Node01","enodeId":"12121212","minerAddress":"0x212121","timeStamp":"0", "ipAddress":"127.0.0.1"}]';
+				//var obj2 = (JSON.parse(str2));
+				//var str3 = JSON.stringify(obj2, null, ' ');
+				
+				var json_str = JSON.stringify(cache_list_bootnodes_obj.bootnodes, null, ' ');
+				//var json_string = JSON.parse(JSON.stringify(cache_list_bootnodes_obj).substr(13, str.length - 2));
+				console.log('json_str: ' + json_str);
+				
+				//var str3 = JSON.stringify(json_str, null, ' ');
+				
+				//console.log('str3: ' + str3);
+				
+				
+				var str4 = 'var data = ' + json_str +';';
+				
+				var assemble = `${b1}\n${str4}\n${b2}`;
+				console.log('assemble: ' + assemble);
+				response.write(assemble);
+				//response.write(data.toString());
+				
+			} else {
+				// Write the content of the file to response body
+				response.write(data.toString());
+			}	
 		}
 					
 		// Send the response body 
 		response.end();
-	});   
+	});
 }).listen(port);
 
 process.on('SIGTERM', () => {
