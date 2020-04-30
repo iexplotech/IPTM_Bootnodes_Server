@@ -32,7 +32,7 @@ const list_bootnodes_json = '/list_bootnodes.json';
 const invalid_request_html = '/invalid_request.html';
 const bootnodes_table_html = '/bootnodes_table.html';
 const index_html = '/index.html';
-const default_list_bootnodes = '{"bootnodes":[{"nodeId":"DefaultServerNode01","enodeId":"enode://c6ab138c36886cb28196b1dcd9d7ebc0f2818e543b5a4f93cd1cc7bfc6b6c820f660edce9762027794099adce4edd110409e4e17a2f3862b6a400660a46c4324@127.0.0.1:30303?discport=0","minerAddress":"0x80ce17271ffa4a7f66e2cbf3561a6946587f470d","timeStamp":"26 Apr 2020 17:31:58"}]}';
+const default_list_bootnodes = '{"bootnodes":[{"nodeId":"DefaultServerNode","enodeId":"enode://c6ab138c36886cb28196b1dcd9d7ebc0f2818e543b5a4f93cd1cc7bfc6b6c820f660edce9762027794099adce4edd110409e4e17a2f3862b6a400660a46c4324@127.0.0.1:30303?discport=0","minerAddress":"0x80ce17271ffa4a7f66e2cbf3561a6946587f470d","timeStamp":"26 Apr 2020 17:31:58"}]}';
 const b1 = '<link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" rel=\"stylesheet\">\n<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js\"></script>\n<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js\"></script>\n<script type=\"text/javascript\">'
 const b2 = '$(document).ready(function () {\n    var html = \'<table class=\"table table-striped\">\';\n    html += \'<tr>\';\n    var flag = 0;\n    $.each(data[0], function(index, value){\n        html += \'<th>\'+index+\'</th>\';\n    });\n    html += \'</tr>\';\n     $.each(data, function(index, value){\n         html += \'<tr>\';\n        $.each(value, function(index2, value2){\n            html += \'<td>\'+value2+\'</td>\';\n        });\n        html += \'<tr>\';\n     });\n     html += \'</table>\';\n     $(\'body\').html(html);\n});\n</script>';
 
@@ -42,7 +42,7 @@ var url = require('url');
 
 var port = 8080;
 var Invalid_Request;
-var cache_list_bootnodes_obj;
+var cache_list_bootnodes_obj = JSON.parse(default_list_bootnodes);
 
 var showCacheListBootnodes_obj = function display(){
 	for (i in cache_list_bootnodes_obj.bootnodes) {
