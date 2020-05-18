@@ -1,7 +1,7 @@
 // Institusi Pendidikan Tinggi Malaysia (IPTM) Blockchain Project: Bootnodes for IPTM Blockchain Nodes
 // Programmer: Dr. Mohd Anuar Mat Isa, iExploTech & IPTM Secretariat
 // Website: https://github.com/iexplotech  www.iptm.online, www.mhei.online, www.iexplotech.com
-// License: GNU General Public License v3.0
+// License: GNU General Public License (GPL) v3.0
 
 const Bootnodes_Server_Version = 'alpha:0.1:IPTM:iExploTech';
 console.log('IPTM BOOTNODES SERVER, Version: ' + Bootnodes_Server_Version);
@@ -40,7 +40,7 @@ var http = require('http');
 var fs = require('fs');
 var url = require('url');
 
-var port = 8080;
+const port = 80;
 var Invalid_Request;
 var cache_list_bootnodes_obj = JSON.parse(default_list_bootnodes);
 
