@@ -3,8 +3,8 @@
 // Website: https://github.com/iexplotech  www.iptm.online, www.mhei.online, www.iexplotech.com
 // License: GNU General Public License (GPL) v3.0
 
-const Bootnodes_Server_Version = 'alpha:0.1:IPTM:iExploTech';
-console.log('IPTM BOOTNODES SERVER, Version: ' + Bootnodes_Server_Version);
+const Bootnodes_Server_Version = 'alpha:0.1.1:IPTM:iExploTech';
+console.log('IPTM BOOTNODES SERVER (Windows/Linux/Mac), Version: ' + Bootnodes_Server_Version);
 
 // Configuration Flag
 //const MACHINE_HOST_CLIENT_SERVER = true; // this machine running both bootnode server and client
@@ -14,7 +14,7 @@ console.log('IPTM BOOTNODES SERVER, Version: ' + Bootnodes_Server_Version);
 var win32 = process.platform === "win32"; // Same for x64 Win OS
 var darwin = process.platform === "darwin";  // Mac
 var linux = process.platform === "linux";
-console.log(`Supported OS Platform = Windows:${win32} Linux:${darwin} Mac:${linux}`);
+console.log(`Supported OS Platform = Windows:${win32} Linux:${linux} Mac:${darwin}`);
 console.log(`This OS Platform is ${process.platform}`);
 
 if(win32 == true) {
@@ -89,7 +89,6 @@ fs.readFile(list_bootnodes_json.substr(1), function (err, data) {
 	}
 });
 // End Initial Values
-
 
 
 var IsJsonString = function (str) {
@@ -172,7 +171,6 @@ var readListBootnodes = function (data) {
 	
 	
 }
-
 
 var checkBootnodesData = function (data, client_ip) {
 	console.log('client_ip: ' + client_ip);  // e.g. ::ffff:127.0.0.1
