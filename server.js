@@ -172,8 +172,8 @@ var readListBootnodes = function (data) {
 	
 }
 
-var checkBootnodesData = function (data, client_ip) {
-	console.log('client_ip: ' + client_ip);  // e.g. ::ffff:127.0.0.1
+var checkBootnodesData = function (data, client_ip, index_ip) {
+	console.log('client_ip: ' + client_ip);  // e.g. ::ffff:127.0.0.1 (direct), 127.0.0.1 (x-forward)
 	console.log('checkBootnodesData: ' + data);
 	
 	if(client_ip === null)
@@ -206,7 +206,7 @@ var checkBootnodesData = function (data, client_ip) {
 		
 		// modify enodeId to public ipv4 addresss
 		console.log('enodeId from Client: ' + obj.bootnodes[0].enodeId);
-		obj.bootnodes[0].enodeId = obj.bootnodes[0].enodeId.replace('127.0.0.1', IPAddressArray[3]); // replace to public IPv4 Address
+		obj.bootnodes[0].enodeId = obj.bootnodes[0].enodeId.replace('127.0.0.1', IPAddressArray[index_ip]); // replace to public IPv4 Address, index_ip direct 3, x-forward 0
 		console.log('enodeId from Client updated to Public IP: ' + obj.bootnodes[0].enodeId);
 		
 		data = JSON.stringify(obj); // update bootnode data with updated public IPv4 Address 
@@ -244,10 +244,14 @@ const server = http.createServer( function (request, response) {
 		// json file
 		} else if (pathname === list_bootnodes_json) {
 			console.log(list_bootnodes_json);
-			if(request.headers['x-forwarded-for'].length > 8) {  // proxy client address
-				checkBootnodesData(body, request.headers['x-forwarded-for']);
+			if(request.headers['x-forwarded-for'].length >= 8) {  // proxy client address
+				console.log('Client Address Proxy: ' + request.headers['x-forwarded-for']);
+				checkBootnodesData(body, request.headers['x-forwarded-for'], 0);
+			}else if(request.socket.remoteAddress === 'undefined') {  // proxy client address
+				console.log('Client Address: ' + request.socket.remoteAddress);
+				console.log('Skipped!');
 			} else {
-				checkBootnodesData(body, request.socket.remoteAddress);
+				checkBootnodesData(body, request.socket.remoteAddress, 3);
 			}
 			
 		// table file
