@@ -269,7 +269,7 @@ const server = http.createServer( function (request, response) {
 			response.writeHead(404, {'Content-Type': 'text/html'});
 			
 			//response.write("Invalid Request to IPTM Bootnodes");
-			response.write(Invalid_Request);
+			response.write(Invalid_Request + "\nPlease Try: http://iptmbootnodes.iexplotech.com/index.html");
 
 		} else {
 			// Page found	  
