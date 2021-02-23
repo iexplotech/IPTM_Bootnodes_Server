@@ -3,7 +3,7 @@
 // Website: https://github.com/iexplotech  www.iptm.online, www.mhei.online, www.iexplotech.com
 // License: GNU General Public License (GPL) v3.0
 
-const Bootnodes_Server_Version = 'alpha:0.1.1:IPTM:iExploTech';
+const Bootnodes_Server_Version = 'alpha:0.1.2:IPTM:iExploTech';
 console.log('IPTM BOOTNODES SERVER (Windows/Linux/Mac), Version: ' + Bootnodes_Server_Version);
 
 // Configuration Flag
@@ -244,7 +244,11 @@ const server = http.createServer( function (request, response) {
 		// json file
 		} else if (pathname === list_bootnodes_json) {
 			console.log(list_bootnodes_json);
-			checkBootnodesData(body, request.socket.remoteAddress);
+			if(request.headers['x-forwarded-for'].length > 8) {  // proxy client address
+				checkBootnodesData(body, request.headers['x-forwarded-for']);
+			} else {
+				checkBootnodesData(body, request.socket.remoteAddress);
+			}
 			
 		// table file
 		} else if (pathname === bootnodes_table_html) {
@@ -320,4 +324,3 @@ process.on('SIGTERM', () => {
 
 // Console will print the message
 console.log('IPTM Bootnodes Server running at http://localhost:' + port + '/');
-
